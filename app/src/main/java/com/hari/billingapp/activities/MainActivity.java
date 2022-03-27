@@ -65,9 +65,7 @@ public class MainActivity extends AppCompatActivity {
         check.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                export export = new export();
-
-                Toast.makeText(MainActivity.this, "Your bill has been generated..,", Toast.LENGTH_LONG).show();
+                export export = new export(MainActivity.this);
 
                 reset();
             }

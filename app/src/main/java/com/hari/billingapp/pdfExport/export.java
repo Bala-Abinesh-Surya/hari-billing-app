@@ -1,6 +1,7 @@
 package com.hari.billingapp.pdfExport;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,7 +10,10 @@ import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.util.Log;
+import android.widget.Toast;
 
+import com.hari.billingapp.activities.MainActivity;
 import com.hari.billingapp.constants.data;
 import com.hari.billingapp.models.Product;
 
@@ -24,8 +28,13 @@ import java.util.Date;
 import java.util.Locale;
 
 public class export extends Activity {
+
+    private Context context;
+
     // Constructor
-    public export(){
+    public export(Context context){
+        this.context = context;
+
         determineLength();
 
         createPDF();
@@ -199,23 +208,29 @@ public class export extends Activity {
         // writing to the external storage
         // creating a File object
         File file;
+        String fileName;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
             file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "Bills");
+
+            // ":" in date is not allowed in file names in Android 11 I guess
+            // so replacing ":" with "-"
+            fileName = file + "/" + "Bill - " + localDateTime.toString().replaceAll(":", "-") + ".pdf";
         }
         else{
             file = new File(Environment.getExternalStorageDirectory(), "Bills");
+            fileName = file + "/" + "Bill - " + localDateTime + ".pdf";
         }
-
-        String fileName = file + "/" + "Bill - " + localDateTime + ".pdf";
 
         // writing the pdf to the file created
         try{
             pdfDocument.writeTo(new FileOutputStream(fileName));
-            //Toast.makeText(getApplicationContext(), "created", Toast.LENGTH_LONG).show();
+
+            Toast.makeText(context, "Your bill has been generated..,", Toast.LENGTH_LONG).show();
         }
         catch (Exception exception){
             exception.printStackTrace();
-            //Toast.makeText(getApplicationContext(), exception.toString(), Toast.LENGTH_LONG).show();
+
+            Toast.makeText(context, "Bill has not been generated..,", Toast.LENGTH_LONG).show();
         }
 
         pdfDocument.close();
